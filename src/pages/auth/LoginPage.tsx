@@ -54,7 +54,7 @@ const LoginPage: React.FC = () => {
         navigate(from, { replace: true })
         return
       }
-      toast.error(response.message || 'Login failed')
+      toast.error('Invalid email or password!')
     } catch (error) {
       console.error('Login error:', error)
       let errorMsg = 'Login failed. Please try again.'
