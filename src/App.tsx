@@ -5,7 +5,7 @@ import { AuthProvider } from '~/contexts/AuthContext'
 import { setNavigate } from '~/config/axios'
 import LoginPage from '~/pages/auth/LoginPage'
 import ProtectedRoute from '~/components/auth/ProtectedRoute'
-import NotFound from '~/pages/error/NotFoud'
+import NotFound from '~/pages/error/NotFound'
 import Dashboard from '~/pages/manage/Daskboard'
 
 const AppRoutes: React.FC = () => {
