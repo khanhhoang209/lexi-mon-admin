@@ -25,12 +25,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Validate JWT format and check if expired
         if (!isValidJWT(savedToken)) {
           localStorage.removeItem('token')
+          localStorage.removeItem('user')
           setLoading(false)
           return
         }
 
         if (isTokenExpired(savedToken)) {
           localStorage.removeItem('token')
+          localStorage.removeItem('user')
           setLoading(false)
           return
         }
@@ -42,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (decodedUser.role.toLowerCase() !== 'admin') {
             console.warn('Access denied. User is not an administrator')
             localStorage.removeItem('token')
+            localStorage.removeItem('user')
             setLoading(false)
             return
           }
@@ -51,10 +54,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else {
           console.error('Failed to decode JWT token')
           localStorage.removeItem('token')
+          localStorage.removeItem('user')
         }
       } catch (error) {
         console.error('Error processing saved token:', error)
         localStorage.removeItem('token')
+        localStorage.removeItem('user')
       }
     }
     setLoading(false)
@@ -96,6 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setToken(null)
     setUser(null)
   }
