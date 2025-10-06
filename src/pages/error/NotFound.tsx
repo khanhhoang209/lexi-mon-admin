@@ -61,7 +61,7 @@ const NotFound: React.FC = () => {
           <div className='mt-8 pt-6 border-t border-gray-200'>
             <p className='text-sm text-gray-500'>
               Need help? Contact our{' '}
-              <a href='mailto:support@example.com' className='text-blue-600 hover:text-blue-800 underline'>
+              <a href='mailto:leximon@service.com' className='text-blue-600 hover:text-blue-800 underline'>
                 support team
               </a>
             </p>
