@@ -7,6 +7,7 @@ import LoginPage from '~/pages/auth/LoginPage'
 import ProtectedRoute from '~/components/auth/ProtectedRoute'
 import NotFound from '~/pages/error/NotFound'
 import Dashboard from '~/pages/manage/Daskboard'
+import { ROLE } from '~/components/constant/role'
 
 const AppRoutes: React.FC = () => {
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path='/'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -32,7 +33,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path='/dashboard'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -42,7 +43,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path='/users'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -50,7 +51,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path='/vocabulary'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -58,7 +59,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path='/packages'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>
             <Dashboard />
           </ProtectedRoute>
         }
@@ -66,7 +67,7 @@ const AppRoutes: React.FC = () => {
       <Route
         path='/assets'
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>>
             <Dashboard />
           </ProtectedRoute>
         }
