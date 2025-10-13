@@ -52,6 +52,50 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       active: location.pathname === '/vocabulary'
     },
     {
+      id: 'item',
+      name: 'Item',
+      icon: (
+        <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+          <path d='M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z' />
+        </svg>
+      ),
+      path: '/items',
+      active: location.pathname === '/items'
+    },
+    {
+      id: 'course',
+      name: 'Course',
+      icon: (
+        <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+          <path d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
+        </svg>
+      ),
+      path: '/courses',
+      active: location.pathname === '/courses'
+    },
+    {
+      id: 'category',
+      name: 'Category',
+      icon: (
+        <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+          <path d='M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z' />
+        </svg>
+      ),
+      path: '/categories',
+      active: location.pathname === '/categories'
+    },
+    {
+      id: 'level-range',
+      name: 'Level Range',
+      icon: (
+        <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+          <path d='M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z' />
+        </svg>
+      ),
+      path: '/level-ranges',
+      active: location.pathname === '/level-ranges'
+    },
+    {
       id: 'package',
       name: 'Package',
       icon: (
@@ -88,6 +132,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     if (currentPath === '/' || currentPath === '/dashboard') return 'Dashboard'
     if (currentPath === '/users') return 'User Management'
     if (currentPath === '/vocabulary') return 'Vocabulary Management'
+    if (currentPath === '/items') return 'Item Management'
+    if (currentPath === '/courses') return 'Course Management'
+    if (currentPath === '/categories') return 'Category Management'
+    if (currentPath === '/level-ranges') return 'Level Range Management'
     if (currentPath === '/packages') return 'Package Management'
     if (currentPath === '/assets') return 'Asset Management'
     return 'Dashboard'
