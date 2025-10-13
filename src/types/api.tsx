@@ -15,13 +15,3 @@ export interface PaginatedResponse<T> {
   data: T[]
 }
 
-// Auth API interfaces
-export interface LoginRequest {
-  email: string
-  password: string
-}
-
-export interface LoginResponse {
-  token: string
-  expiredIn: number
-}
