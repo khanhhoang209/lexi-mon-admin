@@ -253,13 +253,27 @@ const ItemManagement: React.FC = () => {
       const formDataToSend = new FormData()
       formDataToSend.append('Name', formData.name.trim())
       formDataToSend.append('CategoryId', formData.categoryId)
-      formDataToSend.append('IsPremium', String(formData.isPremium))
-      formDataToSend.append('Price', String(formData.price))
-      formDataToSend.append('Coin', String(formData.coin))
+      // Backend có thể cần lowercase 'true'/'false' string
+      formDataToSend.append('IsPremium', formData.isPremium ? 'True' : 'False')
+      formDataToSend.append('Price', formData.price.toString())
+      formDataToSend.append('Coin', formData.coin.toString())
       formDataToSend.append('Description', formData.description.trim())
 
       if (imageFile) {
         formDataToSend.append('Image', imageFile)
+      }
+
+      console.log('=== Sending Item Data ===')
+      console.log('Name:', formData.name)
+      console.log('IsPremium (boolean):', formData.isPremium)
+      console.log('IsPremium (toString):', formData.isPremium.toString())
+      console.log('Price:', formData.price)
+      console.log('Coin:', formData.coin)
+
+      // Debug FormData
+      console.log('=== FormData Contents ===')
+      for (const [key, value] of formDataToSend.entries()) {
+        console.log(`${key}:`, value, `(type: ${typeof value})`)
       }
 
       if (editingItem) {
@@ -273,6 +287,10 @@ const ItemManagement: React.FC = () => {
         })
 
         const data = await response.json()
+
+        console.log('=== UPDATE Response ===')
+        console.log('Status:', response.status)
+        console.log('Data:', data)
 
         if (data.succeeded) {
           toast.success('Cập nhật item thành công')
@@ -292,6 +310,10 @@ const ItemManagement: React.FC = () => {
         })
 
         const data = await response.json()
+
+        console.log('=== CREATE Response ===')
+        console.log('Status:', response.status)
+        console.log('Data:', data)
 
         if (data.succeeded) {
           toast.success('Thêm item thành công')
@@ -470,10 +492,10 @@ const ItemManagement: React.FC = () => {
                           <img
                             src={item.imageUrl}
                             alt={item.itemName}
-                            className='w-16 h-16 object-cover rounded'
+                            className='w-32 h-24 object-cover rounded'
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
-                              target.src = 'https://via.placeholder.com/64?text=No+Image'
+                              target.src = 'https://via.placeholder.com/128x96?text=No+Image'
                             }}
                           />
                         </td>
@@ -496,10 +518,10 @@ const ItemManagement: React.FC = () => {
                           </span>
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                          {item.isPremium ? formatCurrency(item.price) : '-'}
+                          {item.price > 0 ? formatCurrency(item.price) : '-'}
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                          {item.isPremium ? item.coin : '-'}
+                          {item.coin > 0 ? item.coin : '-'}
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap'>
                           <span
