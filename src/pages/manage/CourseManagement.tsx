@@ -13,7 +13,6 @@ import type {
   Question,
   QuestionsListResponse,
   Answer,
-  CreateQuestionRequest,
   UpdateQuestionRequest
 } from '~/types/course'
 
@@ -1106,10 +1105,10 @@ const CourseManagement: React.FC = () => {
                           <img
                             src={course.imageUrl}
                             alt={course.title}
-                            className='w-16 h-16 object-cover rounded'
+                            className='w-32 h-24 object-cover rounded'
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
-                              target.src = 'https://via.placeholder.com/64?text=No+Image'
+                              target.src = 'https://via.placeholder.com/128x96?text=No+Image'
                             }}
                           />
                         </td>

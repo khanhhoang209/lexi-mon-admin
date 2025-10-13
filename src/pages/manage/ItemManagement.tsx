@@ -470,10 +470,10 @@ const ItemManagement: React.FC = () => {
                           <img
                             src={item.imageUrl}
                             alt={item.itemName}
-                            className='w-16 h-16 object-cover rounded'
+                            className='w-32 h-24 object-cover rounded'
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
-                              target.src = 'https://via.placeholder.com/64?text=No+Image'
+                              target.src = 'https://via.placeholder.com/128x96?text=No+Image'
                             }}
                           />
                         </td>
@@ -496,10 +496,10 @@ const ItemManagement: React.FC = () => {
                           </span>
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                          {item.isPremium ? formatCurrency(item.price) : '-'}
+                          {item.price > 0 ? formatCurrency(item.price) : '-'}
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                          {item.isPremium ? item.coin : '-'}
+                          {item.coin > 0 ? item.coin : '-'}
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap'>
                           <span
