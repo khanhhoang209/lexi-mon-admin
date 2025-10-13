@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router'
 import { toast } from 'sonner'
 import { apiService } from '~/config/axios'
 import { useAuth } from '~/contexts/AuthContext'
-import type { LoginRequest, LoginResponse } from '~/types/api'
+import type { LoginRequest, LoginResponse } from '~/types/auth'
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState<LoginRequest>({
