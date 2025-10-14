@@ -7,7 +7,10 @@ import LoginPage from '~/pages/auth/LoginPage'
 import ProtectedRoute from '~/components/auth/ProtectedRoute'
 import NotFound from '~/pages/error/NotFound'
 import Dashboard from '~/pages/manage/Daskboard'
-
+import CourseManagement from '~/pages/manage/CourseManagement'
+import CategoryManagement from '~/pages/manage/CategoryManagement'
+import ItemManagement from '~/pages/manage/ItemManagement'
+import LevelRangeManagement from '~/pages/manage/LevelRangeManagement'
 const AppRoutes: React.FC = () => {
   const navigate = useNavigate()
 
@@ -47,11 +50,44 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path='/courses'
+        element={
+          <ProtectedRoute>
+            <CourseManagement />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path='/vocabulary'
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/items'
+        element={
+          <ProtectedRoute>
+            <ItemManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/categories'
+        element={
+          <ProtectedRoute>
+            <CategoryManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/level-ranges'
+        element={
+          <ProtectedRoute>
+            <LevelRangeManagement />
           </ProtectedRoute>
         }
       />
