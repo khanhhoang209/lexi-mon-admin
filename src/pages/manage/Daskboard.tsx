@@ -442,94 +442,117 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Chart Placeholder */}
-            <div className='h-64 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-gray-200 p-3'>
+            <div className='h-64 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-gray-200 p-3 pb-3'>
               {/* Week View - 7 days (Mon-Sun) with 3 bars each */}
               {salesPeriod === 'week' && (
-                <div className='grid grid-cols-7 gap-2.5 h-full items-end pb-3'>
+                <div className='h-full flex items-center justify-center'>
                   {loadingWeeklyRevenue ? (
-                    <div className='col-span-7 flex items-center justify-center text-gray-500'>Đang tải...</div>
+                    <div className='text-gray-500'>Đang tải...</div>
                   ) : weeklyRevenueData ? (
-                    <>
-                      {[
-                        { day: 'T2', data: weeklyRevenueData.monday },
-                        { day: 'T3', data: weeklyRevenueData.tuesday },
-                        { day: 'T4', data: weeklyRevenueData.wednesday },
-                        { day: 'T5', data: weeklyRevenueData.thursday },
-                        { day: 'T6', data: weeklyRevenueData.friday },
-                        { day: 'T7', data: weeklyRevenueData.saturday },
-                        { day: 'CN', data: weeklyRevenueData.sunday }
-                      ].map(({ day, data }) => {
-                        const maxRevenue = Math.max(
-                          weeklyRevenueData.monday.totalRevenue,
-                          weeklyRevenueData.tuesday.totalRevenue,
-                          weeklyRevenueData.wednesday.totalRevenue,
-                          weeklyRevenueData.thursday.totalRevenue,
-                          weeklyRevenueData.friday.totalRevenue,
-                          weeklyRevenueData.saturday.totalRevenue,
-                          weeklyRevenueData.sunday.totalRevenue
-                        )
-                        const getHeight = (revenue: number) => {
-                          if (maxRevenue === 0) return '10%'
-                          return `${(revenue / maxRevenue) * 100}%`
-                        }
-                        const getPercentage = (revenue: number) => {
-                          if (data.totalRevenue === 0) return 0
-                          return Math.round((revenue / data.totalRevenue) * 100)
-                        }
+                    (() => {
+                      const totalWeekRevenue =
+                        weeklyRevenueData.monday.totalRevenue +
+                        weeklyRevenueData.tuesday.totalRevenue +
+                        weeklyRevenueData.wednesday.totalRevenue +
+                        weeklyRevenueData.thursday.totalRevenue +
+                        weeklyRevenueData.friday.totalRevenue +
+                        weeklyRevenueData.saturday.totalRevenue +
+                        weeklyRevenueData.sunday.totalRevenue
 
-                        return (
-                          <div key={day} className='flex flex-col items-center gap-2 h-full justify-end'>
-                            <div className='flex gap-0.5 items-end h-40'>
-                              <div
-                                className='w-6 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
-                                style={{
-                                  height: getHeight(data.itemRevenue),
-                                  minHeight: data.itemRevenue > 0 ? '10px' : '0'
-                                }}
-                                title={`Vật phẩm: ${data.itemRevenue.toLocaleString()} VNĐ (${getPercentage(data.itemRevenue)}%)`}
-                              >
-                                {data.itemRevenue > 0 && data.totalRevenue > 0 && (
-                                  <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
-                                    {getPercentage(data.itemRevenue)}%
-                                  </span>
-                                )}
+                      if (totalWeekRevenue === 0) {
+                        return <div className='text-gray-400'>Không có dữ liệu</div>
+                      }
+
+                      return (
+                        <div className='grid grid-cols-7 gap-2.5 h-full items-end w-full'>
+                          {[
+                            { day: 'T2', data: weeklyRevenueData.monday },
+                            { day: 'T3', data: weeklyRevenueData.tuesday },
+                            { day: 'T4', data: weeklyRevenueData.wednesday },
+                            { day: 'T5', data: weeklyRevenueData.thursday },
+                            { day: 'T6', data: weeklyRevenueData.friday },
+                            { day: 'T7', data: weeklyRevenueData.saturday },
+                            { day: 'CN', data: weeklyRevenueData.sunday }
+                          ].map(({ day, data }) => {
+                            const maxRevenue = Math.max(
+                              weeklyRevenueData.monday.totalRevenue,
+                              weeklyRevenueData.tuesday.totalRevenue,
+                              weeklyRevenueData.wednesday.totalRevenue,
+                              weeklyRevenueData.thursday.totalRevenue,
+                              weeklyRevenueData.friday.totalRevenue,
+                              weeklyRevenueData.saturday.totalRevenue,
+                              weeklyRevenueData.sunday.totalRevenue
+                            )
+                            const getHeight = (revenue: number) => {
+                              if (maxRevenue === 0) return '10%'
+                              return `${(revenue / maxRevenue) * 100}%`
+                            }
+                            const getPercentage = (revenue: number) => {
+                              if (data.totalRevenue === 0) return 0
+                              return Math.round((revenue / data.totalRevenue) * 100)
+                            }
+
+                            return (
+                              <div key={day} className='flex flex-col items-center gap-2 h-full justify-end'>
+                                <div className='flex gap-0.5 items-end flex-1'>
+                                  {data.itemRevenue > 0 && (
+                                    <div
+                                      className='w-6 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
+                                      style={{
+                                        height: getHeight(data.itemRevenue),
+                                        minHeight: '10px'
+                                      }}
+                                      title={`Vật phẩm: ${data.itemRevenue.toLocaleString()} VNĐ (${getPercentage(data.itemRevenue)}%)`}
+                                    >
+                                      {data.totalRevenue > 0 && (
+                                        <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
+                                          {getPercentage(data.itemRevenue)}%
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                  {data.courseRevenue > 0 && (
+                                    <div
+                                      className='w-6 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
+                                      style={{
+                                        height: getHeight(data.courseRevenue),
+                                        minHeight: '10px'
+                                      }}
+                                      title={`Khóa học: ${data.courseRevenue.toLocaleString()} VNĐ (${getPercentage(data.courseRevenue)}%)`}
+                                    >
+                                      {data.totalRevenue > 0 && (
+                                        <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
+                                          {getPercentage(data.courseRevenue)}%
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                  {data.premiumRevenue > 0 && (
+                                    <div
+                                      className='w-6 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
+                                      style={{
+                                        height: getHeight(data.premiumRevenue),
+                                        minHeight: '10px'
+                                      }}
+                                      title={`Premium: ${data.premiumRevenue.toLocaleString()} VNĐ (${getPercentage(data.premiumRevenue)}%)`}
+                                    >
+                                      {data.totalRevenue > 0 && (
+                                        <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
+                                          {getPercentage(data.premiumRevenue)}%
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                                <span className='text-xs font-medium text-gray-600'>{day}</span>
                               </div>
-                              <div
-                                className='w-6 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
-                                style={{
-                                  height: getHeight(data.courseRevenue),
-                                  minHeight: data.courseRevenue > 0 ? '10px' : '0'
-                                }}
-                                title={`Khóa học: ${data.courseRevenue.toLocaleString()} VNĐ (${getPercentage(data.courseRevenue)}%)`}
-                              >
-                                {data.courseRevenue > 0 && data.totalRevenue > 0 && (
-                                  <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
-                                    {getPercentage(data.courseRevenue)}%
-                                  </span>
-                                )}
-                              </div>
-                              <div
-                                className='w-6 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
-                                style={{
-                                  height: getHeight(data.premiumRevenue),
-                                  minHeight: data.premiumRevenue > 0 ? '10px' : '0'
-                                }}
-                                title={`Premium: ${data.premiumRevenue.toLocaleString()} VNĐ (${getPercentage(data.premiumRevenue)}%)`}
-                              >
-                                {data.premiumRevenue > 0 && data.totalRevenue > 0 && (
-                                  <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
-                                    {getPercentage(data.premiumRevenue)}%
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <span className='text-xs font-medium text-gray-600'>{day}</span>
-                          </div>
-                        )
-                      })}
-                    </>
+                            )
+                          })}
+                        </div>
+                      )
+                    })()
                   ) : (
-                    <div className='col-span-7 flex items-center justify-center text-gray-400'>Không có dữ liệu</div>
+                    <div className='text-gray-400'>Không có dữ liệu</div>
                   )}
                 </div>
               )}
@@ -542,59 +565,69 @@ const Dashboard: React.FC = () => {
                   ) : monthlyRevenueData.totalRevenue > 0 ? (
                     <>
                       {/* Item */}
-                      <div className='flex items-center gap-3'>
-                        <span className='text-xs font-medium text-gray-600 w-20'>Vật phẩm</span>
-                        <div className='flex-1 bg-gray-200 rounded-full h-8'>
-                          <div
-                            className='h-8 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
-                            style={{
-                              width: `${(monthlyRevenueData.itemRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
-                              minWidth: monthlyRevenueData.itemRevenue > 0 ? '60px' : '0'
-                            }}
-                            title={`Vật phẩm: ${monthlyRevenueData.itemRevenue.toLocaleString()} VNĐ`}
-                          >
-                            <span className='text-xs font-semibold text-white'>
-                              {Math.round((monthlyRevenueData.itemRevenue / monthlyRevenueData.totalRevenue) * 100)}%
-                            </span>
+                      {monthlyRevenueData.itemRevenue > 0 && (
+                        <div className='flex items-center gap-3'>
+                          <span className='text-xs font-medium text-gray-600 w-20'>Vật phẩm</span>
+                          <div className='flex-1 bg-gray-200 rounded-full h-8'>
+                            <div
+                              className='h-8 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
+                              style={{
+                                width: `${(monthlyRevenueData.itemRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
+                                minWidth: '60px'
+                              }}
+                              title={`Vật phẩm: ${monthlyRevenueData.itemRevenue.toLocaleString()} VNĐ`}
+                            >
+                              <span className='text-xs font-semibold text-white'>
+                                {Math.round((monthlyRevenueData.itemRevenue / monthlyRevenueData.totalRevenue) * 100)}%
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                       {/* Course */}
-                      <div className='flex items-center gap-3'>
-                        <span className='text-xs font-medium text-gray-600 w-20'>Khóa học</span>
-                        <div className='flex-1 bg-gray-200 rounded-full h-8'>
-                          <div
-                            className='h-8 bg-gradient-to-r from-blue-500 to-blue-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
-                            style={{
-                              width: `${(monthlyRevenueData.courseRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
-                              minWidth: monthlyRevenueData.courseRevenue > 0 ? '60px' : '0'
-                            }}
-                            title={`Khóa học: ${monthlyRevenueData.courseRevenue.toLocaleString()} VNĐ`}
-                          >
-                            <span className='text-xs font-semibold text-white'>
-                              {Math.round((monthlyRevenueData.courseRevenue / monthlyRevenueData.totalRevenue) * 100)}%
-                            </span>
+                      {monthlyRevenueData.courseRevenue > 0 && (
+                        <div className='flex items-center gap-3'>
+                          <span className='text-xs font-medium text-gray-600 w-20'>Khóa học</span>
+                          <div className='flex-1 bg-gray-200 rounded-full h-8'>
+                            <div
+                              className='h-8 bg-gradient-to-r from-blue-500 to-blue-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
+                              style={{
+                                width: `${(monthlyRevenueData.courseRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
+                                minWidth: '60px'
+                              }}
+                              title={`Khóa học: ${monthlyRevenueData.courseRevenue.toLocaleString()} VNĐ`}
+                            >
+                              <span className='text-xs font-semibold text-white'>
+                                {Math.round((monthlyRevenueData.courseRevenue / monthlyRevenueData.totalRevenue) * 100)}
+                                %
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                       {/* Premium */}
-                      <div className='flex items-center gap-3'>
-                        <span className='text-xs font-medium text-gray-600 w-20'>Premium</span>
-                        <div className='flex-1 bg-gray-200 rounded-full h-8'>
-                          <div
-                            className='h-8 bg-gradient-to-r from-green-500 to-green-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
-                            style={{
-                              width: `${(monthlyRevenueData.premiumRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
-                              minWidth: monthlyRevenueData.premiumRevenue > 0 ? '60px' : '0'
-                            }}
-                            title={`Premium: ${monthlyRevenueData.premiumRevenue.toLocaleString()} VNĐ`}
-                          >
-                            <span className='text-xs font-semibold text-white'>
-                              {Math.round((monthlyRevenueData.premiumRevenue / monthlyRevenueData.totalRevenue) * 100)}%
-                            </span>
+                      {monthlyRevenueData.premiumRevenue > 0 && (
+                        <div className='flex items-center gap-3'>
+                          <span className='text-xs font-medium text-gray-600 w-20'>Premium</span>
+                          <div className='flex-1 bg-gray-200 rounded-full h-8'>
+                            <div
+                              className='h-8 bg-gradient-to-r from-green-500 to-green-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
+                              style={{
+                                width: `${(monthlyRevenueData.premiumRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
+                                minWidth: '60px'
+                              }}
+                              title={`Premium: ${monthlyRevenueData.premiumRevenue.toLocaleString()} VNĐ`}
+                            >
+                              <span className='text-xs font-semibold text-white'>
+                                {Math.round(
+                                  (monthlyRevenueData.premiumRevenue / monthlyRevenueData.totalRevenue) * 100
+                                )}
+                                %
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </>
                   ) : (
                     <div className='flex items-center justify-center text-gray-400'>Không có dữ liệu</div>
@@ -604,82 +637,104 @@ const Dashboard: React.FC = () => {
 
               {/* Year View - Vertical bars for 12 months */}
               {salesPeriod === 'year' && (
-                <div className='grid grid-cols-12 gap-1 h-full items-end pb-3'>
+                <div className='h-full flex items-center justify-center'>
                   {loadingYearlyRevenue ? (
-                    <div className='col-span-12 flex items-center justify-center text-gray-500'>Đang tải...</div>
+                    <div className='text-gray-500'>Đang tải...</div>
                   ) : yearlyRevenueData ? (
-                    <>
-                      {[
-                        { month: 'T1', data: yearlyRevenueData.january },
-                        { month: 'T2', data: yearlyRevenueData.february },
-                        { month: 'T3', data: yearlyRevenueData.march },
-                        { month: 'T4', data: yearlyRevenueData.april },
-                        { month: 'T5', data: yearlyRevenueData.may },
-                        { month: 'T6', data: yearlyRevenueData.june },
-                        { month: 'T7', data: yearlyRevenueData.july },
-                        { month: 'T8', data: yearlyRevenueData.august },
-                        { month: 'T9', data: yearlyRevenueData.september },
-                        { month: 'T10', data: yearlyRevenueData.october },
-                        { month: 'T11', data: yearlyRevenueData.november },
-                        { month: 'T12', data: yearlyRevenueData.december }
-                      ].map(({ month, data }) => {
-                        const maxRevenue = Math.max(
-                          yearlyRevenueData.january.totalRevenue,
-                          yearlyRevenueData.february.totalRevenue,
-                          yearlyRevenueData.march.totalRevenue,
-                          yearlyRevenueData.april.totalRevenue,
-                          yearlyRevenueData.may.totalRevenue,
-                          yearlyRevenueData.june.totalRevenue,
-                          yearlyRevenueData.july.totalRevenue,
-                          yearlyRevenueData.august.totalRevenue,
-                          yearlyRevenueData.september.totalRevenue,
-                          yearlyRevenueData.october.totalRevenue,
-                          yearlyRevenueData.november.totalRevenue,
-                          yearlyRevenueData.december.totalRevenue
-                        )
-                        const getHeight = (revenue: number) => {
-                          if (maxRevenue === 0) return '10%'
-                          return `${(revenue / maxRevenue) * 100}%`
-                        }
-                        const getPercentage = (revenue: number) => {
-                          if (data.totalRevenue === 0) return 0
-                          return Math.round((revenue / data.totalRevenue) * 100)
-                        }
-                        return (
-                          <div key={month} className='flex flex-col items-center gap-1.5 h-full justify-end'>
-                            <div className='flex gap-0.5 items-end h-40'>
-                              <div
-                                className='w-3 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80'
-                                style={{
-                                  height: getHeight(data.itemRevenue),
-                                  minHeight: data.itemRevenue > 0 ? '8px' : '0'
-                                }}
-                                title={`Vật phẩm: ${data.itemRevenue.toLocaleString()} VNĐ (${getPercentage(data.itemRevenue)}%)`}
-                              ></div>
-                              <div
-                                className='w-3 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80'
-                                style={{
-                                  height: getHeight(data.courseRevenue),
-                                  minHeight: data.courseRevenue > 0 ? '8px' : '0'
-                                }}
-                                title={`Khóa học: ${data.courseRevenue.toLocaleString()} VNĐ (${getPercentage(data.courseRevenue)}%)`}
-                              ></div>
-                              <div
-                                className='w-3 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80'
-                                style={{
-                                  height: getHeight(data.premiumRevenue),
-                                  minHeight: data.premiumRevenue > 0 ? '8px' : '0'
-                                }}
-                                title={`Premium: ${data.premiumRevenue.toLocaleString()} VNĐ (${getPercentage(data.premiumRevenue)}%)`}
-                              ></div>
-                            </div>
-                            <span className='text-xs font-medium text-gray-600'>{month}</span>
-                          </div>
-                        )
-                      })}
-                    </>
+                    (() => {
+                      const totalYearRevenue =
+                        yearlyRevenueData.january.totalRevenue +
+                        yearlyRevenueData.february.totalRevenue +
+                        yearlyRevenueData.march.totalRevenue +
+                        yearlyRevenueData.april.totalRevenue +
+                        yearlyRevenueData.may.totalRevenue +
+                        yearlyRevenueData.june.totalRevenue +
+                        yearlyRevenueData.july.totalRevenue +
+                        yearlyRevenueData.august.totalRevenue +
+                        yearlyRevenueData.september.totalRevenue +
+                        yearlyRevenueData.october.totalRevenue +
+                        yearlyRevenueData.november.totalRevenue +
+                        yearlyRevenueData.december.totalRevenue
+
+                      if (totalYearRevenue === 0) {
+                        return <div className='text-gray-400'>Không có dữ liệu</div>
+                      }
+
+                      return (
+                        <div className='grid grid-cols-12 gap-1 h-full items-end w-full'>
+                          {[
+                            { month: 'T1', data: yearlyRevenueData.january },
+                            { month: 'T2', data: yearlyRevenueData.february },
+                            { month: 'T3', data: yearlyRevenueData.march },
+                            { month: 'T4', data: yearlyRevenueData.april },
+                            { month: 'T5', data: yearlyRevenueData.may },
+                            { month: 'T6', data: yearlyRevenueData.june },
+                            { month: 'T7', data: yearlyRevenueData.july },
+                            { month: 'T8', data: yearlyRevenueData.august },
+                            { month: 'T9', data: yearlyRevenueData.september },
+                            { month: 'T10', data: yearlyRevenueData.october },
+                            { month: 'T11', data: yearlyRevenueData.november },
+                            { month: 'T12', data: yearlyRevenueData.december }
+                          ].map(({ month, data }) => {
+                            const maxRevenue = Math.max(
+                              yearlyRevenueData.january.totalRevenue,
+                              yearlyRevenueData.february.totalRevenue,
+                              yearlyRevenueData.march.totalRevenue,
+                              yearlyRevenueData.april.totalRevenue,
+                              yearlyRevenueData.may.totalRevenue,
+                              yearlyRevenueData.june.totalRevenue,
+                              yearlyRevenueData.july.totalRevenue,
+                              yearlyRevenueData.august.totalRevenue,
+                              yearlyRevenueData.september.totalRevenue,
+                              yearlyRevenueData.october.totalRevenue,
+                              yearlyRevenueData.november.totalRevenue,
+                              yearlyRevenueData.december.totalRevenue
+                            )
+                            const getHeight = (revenue: number) => {
+                              if (maxRevenue === 0) return '10%'
+                              return `${(revenue / maxRevenue) * 100}%`
+                            }
+                            const getPercentage = (revenue: number) => {
+                              if (data.totalRevenue === 0) return 0
+                              return Math.round((revenue / data.totalRevenue) * 100)
+                            }
+                            return (
+                              <div key={month} className='flex flex-col items-center gap-1.5 h-full justify-end'>
+                                <div className='flex gap-0.5 items-end flex-1'>
+                                  <div
+                                    className='w-3 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80'
+                                    style={{
+                                      height: getHeight(data.itemRevenue),
+                                      minHeight: data.itemRevenue > 0 ? '8px' : '0'
+                                    }}
+                                    title={`Vật phẩm: ${data.itemRevenue.toLocaleString()} VNĐ (${getPercentage(data.itemRevenue)}%)`}
+                                  ></div>
+                                  <div
+                                    className='w-3 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80'
+                                    style={{
+                                      height: getHeight(data.courseRevenue),
+                                      minHeight: data.courseRevenue > 0 ? '8px' : '0'
+                                    }}
+                                    title={`Khóa học: ${data.courseRevenue.toLocaleString()} VNĐ (${getPercentage(data.courseRevenue)}%)`}
+                                  ></div>
+                                  <div
+                                    className='w-3 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80'
+                                    style={{
+                                      height: getHeight(data.premiumRevenue),
+                                      minHeight: data.premiumRevenue > 0 ? '8px' : '0'
+                                    }}
+                                    title={`Premium: ${data.premiumRevenue.toLocaleString()} VNĐ (${getPercentage(data.premiumRevenue)}%)`}
+                                  ></div>
+                                </div>
+                                <span className='text-xs font-medium text-gray-600'>{month}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    })()
                   ) : (
-                    <div className='col-span-12 flex items-center justify-center text-gray-400'>Không có dữ liệu</div>
+                    <div className='text-gray-400'>Không có dữ liệu</div>
                   )}
                 </div>
               )}
