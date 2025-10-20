@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useAuth } from '~/contexts/AuthContext'
 import { useNavigate, useLocation } from 'react-router'
 
@@ -10,7 +10,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -163,7 +162,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <h1 className='text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
                 LexiMon
               </h1>
-              <p className='text-xs text-gray-500'>Admin Dashboard</p>
             </div>
           </div>
         </div>
@@ -201,19 +199,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </ul>
         </nav>
 
-        {/* User Info & Logout */}
+        {/* Logout Button */}
         <div className='p-4 border-t border-gray-200 relative z-10'>
-          <div className='bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-3 mb-3 border border-blue-100'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg'>
-                <span className='text-white text-sm font-bold'>{user?.email?.charAt(0).toUpperCase()}</span>
-              </div>
-              <div className='flex-1 min-w-0'>
-                <p className='text-sm font-medium text-gray-900 truncate'>Admin User</p>
-                <p className='text-xs text-gray-500 truncate'>{user?.email}</p>
-              </div>
-            </div>
-          </div>
           <button
             onClick={handleLogout}
             className='w-full flex items-center justify-center px-4 py-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all duration-200 group border border-red-200'
@@ -255,149 +242,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <h2 className='text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent'>
                     {getPageTitle()}
                   </h2>
-                  <p className='text-xs text-slate-500'>Manage your content efficiently</p>
                 </div>
               </div>
             </div>
 
-            <div className='flex items-center space-x-4'>
-              {/* Search with modern design */}
-              <div className='relative group'>
-                <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
-                  <svg
-                    className='h-5 w-5 text-slate-400 group-hover:text-blue-500 transition-colors'
-                    fill='currentColor'
-                    viewBox='0 0 20 20'
-                  >
-                    <path
-                      fillRule='evenodd'
-                      d='M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z'
-                      clipRule='evenodd'
-                    />
-                  </svg>
-                </div>
-                <input
-                  type='text'
-                  placeholder='Search anything...'
-                  className='block w-80 pl-11 pr-4 py-3 border-2 border-slate-200 rounded-2xl leading-5 bg-white/50 backdrop-blur-sm placeholder-slate-400 focus:outline-none focus:placeholder-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200'
-                />
-              </div>
-
-              {/* Notifications */}
-              <button className='relative p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition-all duration-200 group'>
-                <svg
-                  className='w-6 h-6 text-slate-600 group-hover:text-slate-800'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'
-                  />
-                </svg>
-                <span className='absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse'></span>
-              </button>
-
-              {/* Profile Dropdown with premium design */}
-              <div className='relative'>
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className='flex items-center space-x-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 transition-all duration-200 group'
-                >
-                  <div className='w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform'>
+            {/* User Profile */}
+            <div className='flex items-center space-x-3'>
+              <div className='bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl px-4 py-2 border border-blue-100'>
+                <div className='flex items-center space-x-3'>
+                  <div className='flex-1 min-w-0 text-right'>
+                    <p className='text-sm font-medium text-gray-900 truncate'>Admin User</p>
+                    <p className='text-xs text-gray-500 truncate'>{user?.email}</p>
+                  </div>
+                  <div className='w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg'>
                     <span className='text-white text-sm font-bold'>{user?.email?.charAt(0).toUpperCase()}</span>
                   </div>
-                  <div className='text-left'>
-                    <span className='block text-sm font-semibold text-slate-800'>Admin</span>
-                    <span className='block text-xs text-slate-500'>Super User</span>
-                  </div>
-                  <svg
-                    className={`w-5 h-5 text-slate-500 transition-transform duration-200 ${
-                      isProfileOpen ? 'rotate-180' : ''
-                    }`}
-                    fill='currentColor'
-                    viewBox='0 0 20 20'
-                  >
-                    <path
-                      fillRule='evenodd'
-                      d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
-                      clipRule='evenodd'
-                    />
-                  </svg>
-                </button>
-
-                {isProfileOpen && (
-                  <div className='absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden'>
-                    <div className='bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4'>
-                      <div className='flex items-center space-x-3'>
-                        <div className='w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center'>
-                          <span className='text-white text-lg font-bold'>{user?.email?.charAt(0).toUpperCase()}</span>
-                        </div>
-                        <div>
-                          <p className='text-sm font-semibold text-white'>Admin User</p>
-                          <p className='text-xs text-blue-100 truncate'>{user?.email}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='p-2'>
-                      <button className='w-full flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors'>
-                        <svg
-                          className='w-5 h-5 mr-3 text-slate-500'
-                          fill='none'
-                          stroke='currentColor'
-                          viewBox='0 0 24 24'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-                          />
-                        </svg>
-                        My Profile
-                      </button>
-                      <button className='w-full flex items-center px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors'>
-                        <svg
-                          className='w-5 h-5 mr-3 text-slate-500'
-                          fill='none'
-                          stroke='currentColor'
-                          viewBox='0 0 24 24'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'
-                          />
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'
-                          />
-                        </svg>
-                        Settings
-                      </button>
-                      <div className='my-2 h-px bg-slate-200'></div>
-                      <button
-                        onClick={handleLogout}
-                        className='w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium'
-                      >
-                        <svg className='w-5 h-5 mr-3' fill='currentColor' viewBox='0 0 20 20'>
-                          <path
-                            fillRule='evenodd'
-                            d='M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z'
-                            clipRule='evenodd'
-                          />
-                        </svg>
-                        Sign out
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>

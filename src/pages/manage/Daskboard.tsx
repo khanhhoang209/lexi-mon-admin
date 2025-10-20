@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react'
 import AdminLayout from '~/components/layout/AdminLayout'
 import { apiService } from '~/config/axios'
 import { toast } from 'sonner'
-import type { RevenueData, SubscriptionData, PopularLanguagesData, CoinData } from '~/types/dashboard'
+import type {
+  RevenueData,
+  SubscriptionData,
+  PopularLanguagesData,
+  CoinData,
+  WeeklyRevenueData,
+  YearlyRevenueData
+} from '~/types/dashboard'
 
 const Dashboard: React.FC = () => {
   const [revenueData, setRevenueData] = useState<RevenueData>({
@@ -30,6 +37,14 @@ const Dashboard: React.FC = () => {
     korean: 0,
     chinese: 0
   })
+  const [weeklyRevenueData, setWeeklyRevenueData] = useState<WeeklyRevenueData | null>(null)
+  const [monthlyRevenueData, setMonthlyRevenueData] = useState<RevenueData>({
+    itemRevenue: 0,
+    courseRevenue: 0,
+    premiumRevenue: 0,
+    totalRevenue: 0
+  })
+  const [yearlyRevenueData, setYearlyRevenueData] = useState<YearlyRevenueData | null>(null)
   const [salesPeriod, setSalesPeriod] = useState<'week' | 'month' | 'year'>('week')
   const [loading, setLoading] = useState(true)
   const [loadingUsers, setLoadingUsers] = useState(true)
@@ -38,6 +53,9 @@ const Dashboard: React.FC = () => {
   const [loadingItems, setLoadingItems] = useState(true)
   const [loadingSubscription, setLoadingSubscription] = useState(true)
   const [loadingLanguages, setLoadingLanguages] = useState(true)
+  const [loadingWeeklyRevenue, setLoadingWeeklyRevenue] = useState(true)
+  const [loadingMonthlyRevenue, setLoadingMonthlyRevenue] = useState(true)
+  const [loadingYearlyRevenue, setLoadingYearlyRevenue] = useState(true)
   const [startDate, setStartDate] = useState<string>(() => {
     // Default to 1 year ago
     const date = new Date()
@@ -57,6 +75,9 @@ const Dashboard: React.FC = () => {
     fetchTotalItems()
     fetchSubscriptionData()
     fetchPopularLanguages()
+    fetchWeeklyRevenue()
+    fetchMonthlyRevenue()
+    fetchYearlyRevenue()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -189,6 +210,54 @@ const Dashboard: React.FC = () => {
       toast.error('Không thể tải dữ liệu ngôn ngữ phổ biến')
     } finally {
       setLoadingLanguages(false)
+    }
+  }
+
+  const fetchWeeklyRevenue = async () => {
+    try {
+      setLoadingWeeklyRevenue(true)
+      const response = await apiService.get<WeeklyRevenueData>('/dashboards/weekly-revenue')
+
+      if (response.succeeded && response.data) {
+        setWeeklyRevenueData(response.data)
+      }
+    } catch (error) {
+      console.error('Error fetching weekly revenue:', error)
+      toast.error('Không thể tải dữ liệu doanh thu tuần')
+    } finally {
+      setLoadingWeeklyRevenue(false)
+    }
+  }
+
+  const fetchMonthlyRevenue = async () => {
+    try {
+      setLoadingMonthlyRevenue(true)
+      const response = await apiService.get<RevenueData>('/dashboards/monthly-revenue')
+
+      if (response.succeeded && response.data) {
+        setMonthlyRevenueData(response.data)
+      }
+    } catch (error) {
+      console.error('Error fetching monthly revenue:', error)
+      toast.error('Không thể tải dữ liệu doanh thu tháng')
+    } finally {
+      setLoadingMonthlyRevenue(false)
+    }
+  }
+
+  const fetchYearlyRevenue = async () => {
+    try {
+      setLoadingYearlyRevenue(true)
+      const response = await apiService.get<YearlyRevenueData>('/dashboards/yearly-revenue')
+
+      if (response.succeeded && response.data) {
+        setYearlyRevenueData(response.data)
+      }
+    } catch (error) {
+      console.error('Error fetching yearly revenue:', error)
+      toast.error('Không thể tải dữ liệu doanh thu năm')
+    } finally {
+      setLoadingYearlyRevenue(false)
     }
   }
 
@@ -373,96 +442,245 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Chart Placeholder */}
-            <div className='h-64 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-gray-200 p-6'>
+            <div className='h-64 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-gray-200 p-3'>
               {/* Week View - 7 days (Mon-Sun) with 3 bars each */}
               {salesPeriod === 'week' && (
-                <div className='grid grid-cols-7 gap-3 h-full items-end pb-6'>
-                  {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day) => (
-                    <div key={day} className='flex flex-col items-center gap-2 h-full justify-end'>
-                      <div className='flex gap-1 items-end h-40'>
-                        <div
-                          className='w-3 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80'
-                          style={{ height: `${Math.random() * 60 + 40}%` }}
-                        ></div>
-                        <div
-                          className='w-3 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80'
-                          style={{ height: `${Math.random() * 70 + 30}%` }}
-                        ></div>
-                        <div
-                          className='w-3 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80'
-                          style={{ height: `${Math.random() * 50 + 50}%` }}
-                        ></div>
-                      </div>
-                      <span className='text-xs font-medium text-gray-600'>{day}</span>
-                    </div>
-                  ))}
+                <div className='grid grid-cols-7 gap-2.5 h-full items-end pb-3'>
+                  {loadingWeeklyRevenue ? (
+                    <div className='col-span-7 flex items-center justify-center text-gray-500'>Đang tải...</div>
+                  ) : weeklyRevenueData ? (
+                    <>
+                      {[
+                        { day: 'T2', data: weeklyRevenueData.monday },
+                        { day: 'T3', data: weeklyRevenueData.tuesday },
+                        { day: 'T4', data: weeklyRevenueData.wednesday },
+                        { day: 'T5', data: weeklyRevenueData.thursday },
+                        { day: 'T6', data: weeklyRevenueData.friday },
+                        { day: 'T7', data: weeklyRevenueData.saturday },
+                        { day: 'CN', data: weeklyRevenueData.sunday }
+                      ].map(({ day, data }) => {
+                        const maxRevenue = Math.max(
+                          weeklyRevenueData.monday.totalRevenue,
+                          weeklyRevenueData.tuesday.totalRevenue,
+                          weeklyRevenueData.wednesday.totalRevenue,
+                          weeklyRevenueData.thursday.totalRevenue,
+                          weeklyRevenueData.friday.totalRevenue,
+                          weeklyRevenueData.saturday.totalRevenue,
+                          weeklyRevenueData.sunday.totalRevenue
+                        )
+                        const getHeight = (revenue: number) => {
+                          if (maxRevenue === 0) return '10%'
+                          return `${(revenue / maxRevenue) * 100}%`
+                        }
+                        const getPercentage = (revenue: number) => {
+                          if (data.totalRevenue === 0) return 0
+                          return Math.round((revenue / data.totalRevenue) * 100)
+                        }
+
+                        return (
+                          <div key={day} className='flex flex-col items-center gap-2 h-full justify-end'>
+                            <div className='flex gap-0.5 items-end h-40'>
+                              <div
+                                className='w-6 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
+                                style={{
+                                  height: getHeight(data.itemRevenue),
+                                  minHeight: data.itemRevenue > 0 ? '10px' : '0'
+                                }}
+                                title={`Vật phẩm: ${data.itemRevenue.toLocaleString()} VNĐ (${getPercentage(data.itemRevenue)}%)`}
+                              >
+                                {data.itemRevenue > 0 && data.totalRevenue > 0 && (
+                                  <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
+                                    {getPercentage(data.itemRevenue)}%
+                                  </span>
+                                )}
+                              </div>
+                              <div
+                                className='w-6 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
+                                style={{
+                                  height: getHeight(data.courseRevenue),
+                                  minHeight: data.courseRevenue > 0 ? '10px' : '0'
+                                }}
+                                title={`Khóa học: ${data.courseRevenue.toLocaleString()} VNĐ (${getPercentage(data.courseRevenue)}%)`}
+                              >
+                                {data.courseRevenue > 0 && data.totalRevenue > 0 && (
+                                  <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
+                                    {getPercentage(data.courseRevenue)}%
+                                  </span>
+                                )}
+                              </div>
+                              <div
+                                className='w-6 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80 relative flex items-start justify-center pt-1'
+                                style={{
+                                  height: getHeight(data.premiumRevenue),
+                                  minHeight: data.premiumRevenue > 0 ? '10px' : '0'
+                                }}
+                                title={`Premium: ${data.premiumRevenue.toLocaleString()} VNĐ (${getPercentage(data.premiumRevenue)}%)`}
+                              >
+                                {data.premiumRevenue > 0 && data.totalRevenue > 0 && (
+                                  <span className='text-[9px] font-bold text-white' style={{ lineHeight: '1' }}>
+                                    {getPercentage(data.premiumRevenue)}%
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className='text-xs font-medium text-gray-600'>{day}</span>
+                          </div>
+                        )
+                      })}
+                    </>
+                  ) : (
+                    <div className='col-span-7 flex items-center justify-center text-gray-400'>Không có dữ liệu</div>
+                  )}
                 </div>
               )}
 
               {/* Month View - Horizontal bars for 3 categories */}
               {salesPeriod === 'month' && (
                 <div className='flex flex-col justify-center gap-6 h-full'>
-                  {/* Item */}
-                  <div className='flex items-center gap-3'>
-                    <span className='text-xs font-medium text-gray-600 w-20'>Vật phẩm</span>
-                    <div className='flex-1 bg-gray-200 rounded-full h-8'>
-                      <div
-                        className='h-8 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
-                        style={{ width: '70%' }}
-                      >
-                        <span className='text-xs font-semibold text-white'>70%</span>
+                  {loadingMonthlyRevenue ? (
+                    <div className='flex items-center justify-center text-gray-500'>Đang tải...</div>
+                  ) : monthlyRevenueData.totalRevenue > 0 ? (
+                    <>
+                      {/* Item */}
+                      <div className='flex items-center gap-3'>
+                        <span className='text-xs font-medium text-gray-600 w-20'>Vật phẩm</span>
+                        <div className='flex-1 bg-gray-200 rounded-full h-8'>
+                          <div
+                            className='h-8 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
+                            style={{
+                              width: `${(monthlyRevenueData.itemRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
+                              minWidth: monthlyRevenueData.itemRevenue > 0 ? '60px' : '0'
+                            }}
+                            title={`Vật phẩm: ${monthlyRevenueData.itemRevenue.toLocaleString()} VNĐ`}
+                          >
+                            <span className='text-xs font-semibold text-white'>
+                              {Math.round((monthlyRevenueData.itemRevenue / monthlyRevenueData.totalRevenue) * 100)}%
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  {/* Course */}
-                  <div className='flex items-center gap-3'>
-                    <span className='text-xs font-medium text-gray-600 w-20'>Khóa học</span>
-                    <div className='flex-1 bg-gray-200 rounded-full h-8'>
-                      <div
-                        className='h-8 bg-gradient-to-r from-blue-500 to-blue-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
-                        style={{ width: '85%' }}
-                      >
-                        <span className='text-xs font-semibold text-white'>85%</span>
+                      {/* Course */}
+                      <div className='flex items-center gap-3'>
+                        <span className='text-xs font-medium text-gray-600 w-20'>Khóa học</span>
+                        <div className='flex-1 bg-gray-200 rounded-full h-8'>
+                          <div
+                            className='h-8 bg-gradient-to-r from-blue-500 to-blue-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
+                            style={{
+                              width: `${(monthlyRevenueData.courseRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
+                              minWidth: monthlyRevenueData.courseRevenue > 0 ? '60px' : '0'
+                            }}
+                            title={`Khóa học: ${monthlyRevenueData.courseRevenue.toLocaleString()} VNĐ`}
+                          >
+                            <span className='text-xs font-semibold text-white'>
+                              {Math.round((monthlyRevenueData.courseRevenue / monthlyRevenueData.totalRevenue) * 100)}%
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  {/* Premium */}
-                  <div className='flex items-center gap-3'>
-                    <span className='text-xs font-medium text-gray-600 w-20'>Premium</span>
-                    <div className='flex-1 bg-gray-200 rounded-full h-8'>
-                      <div
-                        className='h-8 bg-gradient-to-r from-green-500 to-green-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
-                        style={{ width: '60%' }}
-                      >
-                        <span className='text-xs font-semibold text-white'>60%</span>
+                      {/* Premium */}
+                      <div className='flex items-center gap-3'>
+                        <span className='text-xs font-medium text-gray-600 w-20'>Premium</span>
+                        <div className='flex-1 bg-gray-200 rounded-full h-8'>
+                          <div
+                            className='h-8 bg-gradient-to-r from-green-500 to-green-300 rounded-full transition-all hover:opacity-80 flex items-center justify-end pr-3'
+                            style={{
+                              width: `${(monthlyRevenueData.premiumRevenue / monthlyRevenueData.totalRevenue) * 100}%`,
+                              minWidth: monthlyRevenueData.premiumRevenue > 0 ? '60px' : '0'
+                            }}
+                            title={`Premium: ${monthlyRevenueData.premiumRevenue.toLocaleString()} VNĐ`}
+                          >
+                            <span className='text-xs font-semibold text-white'>
+                              {Math.round((monthlyRevenueData.premiumRevenue / monthlyRevenueData.totalRevenue) * 100)}%
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  ) : (
+                    <div className='flex items-center justify-center text-gray-400'>Không có dữ liệu</div>
+                  )}
                 </div>
               )}
 
               {/* Year View - Vertical bars for 12 months */}
               {salesPeriod === 'year' && (
-                <div className='grid grid-cols-12 gap-2 h-full items-end pb-6'>
-                  {['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'].map((month) => (
-                    <div key={month} className='flex flex-col items-center gap-2 h-full justify-end'>
-                      <div className='flex gap-0.5 items-end h-40'>
-                        <div
-                          className='w-2 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80'
-                          style={{ height: `${Math.random() * 60 + 40}%` }}
-                        ></div>
-                        <div
-                          className='w-2 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80'
-                          style={{ height: `${Math.random() * 70 + 30}%` }}
-                        ></div>
-                        <div
-                          className='w-2 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80'
-                          style={{ height: `${Math.random() * 50 + 50}%` }}
-                        ></div>
-                      </div>
-                      <span className='text-[10px] font-medium text-gray-600'>{month}</span>
-                    </div>
-                  ))}
+                <div className='grid grid-cols-12 gap-1 h-full items-end pb-3'>
+                  {loadingYearlyRevenue ? (
+                    <div className='col-span-12 flex items-center justify-center text-gray-500'>Đang tải...</div>
+                  ) : yearlyRevenueData ? (
+                    <>
+                      {[
+                        { month: 'T1', data: yearlyRevenueData.january },
+                        { month: 'T2', data: yearlyRevenueData.february },
+                        { month: 'T3', data: yearlyRevenueData.march },
+                        { month: 'T4', data: yearlyRevenueData.april },
+                        { month: 'T5', data: yearlyRevenueData.may },
+                        { month: 'T6', data: yearlyRevenueData.june },
+                        { month: 'T7', data: yearlyRevenueData.july },
+                        { month: 'T8', data: yearlyRevenueData.august },
+                        { month: 'T9', data: yearlyRevenueData.september },
+                        { month: 'T10', data: yearlyRevenueData.october },
+                        { month: 'T11', data: yearlyRevenueData.november },
+                        { month: 'T12', data: yearlyRevenueData.december }
+                      ].map(({ month, data }) => {
+                        const maxRevenue = Math.max(
+                          yearlyRevenueData.january.totalRevenue,
+                          yearlyRevenueData.february.totalRevenue,
+                          yearlyRevenueData.march.totalRevenue,
+                          yearlyRevenueData.april.totalRevenue,
+                          yearlyRevenueData.may.totalRevenue,
+                          yearlyRevenueData.june.totalRevenue,
+                          yearlyRevenueData.july.totalRevenue,
+                          yearlyRevenueData.august.totalRevenue,
+                          yearlyRevenueData.september.totalRevenue,
+                          yearlyRevenueData.october.totalRevenue,
+                          yearlyRevenueData.november.totalRevenue,
+                          yearlyRevenueData.december.totalRevenue
+                        )
+                        const getHeight = (revenue: number) => {
+                          if (maxRevenue === 0) return '10%'
+                          return `${(revenue / maxRevenue) * 100}%`
+                        }
+                        const getPercentage = (revenue: number) => {
+                          if (data.totalRevenue === 0) return 0
+                          return Math.round((revenue / data.totalRevenue) * 100)
+                        }
+                        return (
+                          <div key={month} className='flex flex-col items-center gap-1.5 h-full justify-end'>
+                            <div className='flex gap-0.5 items-end h-40'>
+                              <div
+                                className='w-3 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t transition-all hover:opacity-80'
+                                style={{
+                                  height: getHeight(data.itemRevenue),
+                                  minHeight: data.itemRevenue > 0 ? '8px' : '0'
+                                }}
+                                title={`Vật phẩm: ${data.itemRevenue.toLocaleString()} VNĐ (${getPercentage(data.itemRevenue)}%)`}
+                              ></div>
+                              <div
+                                className='w-3 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all hover:opacity-80'
+                                style={{
+                                  height: getHeight(data.courseRevenue),
+                                  minHeight: data.courseRevenue > 0 ? '8px' : '0'
+                                }}
+                                title={`Khóa học: ${data.courseRevenue.toLocaleString()} VNĐ (${getPercentage(data.courseRevenue)}%)`}
+                              ></div>
+                              <div
+                                className='w-3 bg-gradient-to-t from-green-500 to-green-300 rounded-t transition-all hover:opacity-80'
+                                style={{
+                                  height: getHeight(data.premiumRevenue),
+                                  minHeight: data.premiumRevenue > 0 ? '8px' : '0'
+                                }}
+                                title={`Premium: ${data.premiumRevenue.toLocaleString()} VNĐ (${getPercentage(data.premiumRevenue)}%)`}
+                              ></div>
+                            </div>
+                            <span className='text-xs font-medium text-gray-600'>{month}</span>
+                          </div>
+                        )
+                      })}
+                    </>
+                  ) : (
+                    <div className='col-span-12 flex items-center justify-center text-gray-400'>Không có dữ liệu</div>
+                  )}
                 </div>
               )}
             </div>
