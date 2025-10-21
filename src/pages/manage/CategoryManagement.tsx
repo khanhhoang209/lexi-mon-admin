@@ -214,8 +214,8 @@ const CategoryManagement: React.FC = () => {
         {/* Header */}
         <div className='flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-900'>Quản lý danh mục</h1>
-            <p className='mt-2 text-gray-600'>Quản lý danh mục từ vựng trong hệ thống ({totalCount} danh mục)</p>
+            {/* <h1 className='text-3xl font-bold text-gray-900'>Quản lý danh mục</h1> */}
+            <p className='mt-2 text-gray-600'>Tổng số danh mục từ vựng trong hệ thống ({totalCount} danh mục)</p>
           </div>
           <button
             onClick={handleOpenAddModal}

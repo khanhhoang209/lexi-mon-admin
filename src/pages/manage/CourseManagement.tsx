@@ -28,6 +28,9 @@ const CourseManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
   const [searchTitle, setSearchTitle] = useState('')
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
+  const [filterIsActive, setFilterIsActive] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string>('')
 
@@ -104,13 +107,22 @@ const CourseManagement: React.FC = () => {
   const fetchCourses = async (page: number = 1, title: string = '') => {
     setLoading(true)
     try {
-      const params: Record<string, string | number> = {
+      const params: Record<string, string | number | boolean> = {
         Page: page,
         PageSize: pageSize
       }
 
       if (title && title.trim()) {
         params.Title = title.trim()
+      }
+      if (minPrice) {
+        params.MinPrice = Number(minPrice)
+      }
+      if (maxPrice) {
+        params.MaxPrice = Number(maxPrice)
+      }
+      if (filterIsActive !== '') {
+        params.IsActive = filterIsActive === 'true'
       }
 
       console.log('=== Fetching Courses ===')
@@ -177,6 +189,9 @@ const CourseManagement: React.FC = () => {
   const handleReset = () => {
     console.log('=== Resetting ===')
     setSearchTitle('')
+    setMinPrice('')
+    setMaxPrice('')
+    setFilterIsActive('')
     fetchCourses(1, '')
   }
 
@@ -1004,8 +1019,8 @@ const CourseManagement: React.FC = () => {
         {/* Header */}
         <div className='flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-900'>Quản lý Khóa học</h1>
-            <p className='mt-2 text-gray-600'>Quản lý các khóa học trong hệ thống ({totalCount} khóa học)</p>
+            {/* <h1 className='text-3xl font-bold text-gray-900'>Quản lý Khóa học</h1> */}
+            <p className='mt-2 text-gray-600'>Tổng số các khóa học trong hệ thống ({totalCount} khóa học)</p>
           </div>
           <button
             onClick={() => {
@@ -1020,36 +1035,80 @@ const CourseManagement: React.FC = () => {
           </button>
         </div>
 
-        {/* Search Bar */}
-        <div className='bg-white p-4 rounded-lg shadow'>
-          <form onSubmit={handleSearch} className='flex gap-4'>
-            <div className='flex-1'>
-              <div className='relative'>
-                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+        {/* Search & Filter Bar */}
+        <div className='bg-white p-6 rounded-lg shadow'>
+          <form onSubmit={handleSearch} className='space-y-4'>
+            {/* Row 1: Title, Price Range, Status */}
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Tên khóa học</label>
+                <div className='relative'>
+                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+                  <input
+                    type='text'
+                    placeholder='Tìm kiếm...'
+                    value={searchTitle}
+                    onChange={(e) => setSearchTitle(e.target.value)}
+                    className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Giá từ (VNĐ)</label>
                 <input
-                  type='text'
-                  placeholder='Tìm kiếm theo tên khóa học...'
-                  value={searchTitle}
-                  onChange={(e) => setSearchTitle(e.target.value)}
-                  className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  type='number'
+                  placeholder='Giá tối thiểu'
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  min='0'
                 />
               </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Giá đến (VNĐ)</label>
+                <input
+                  type='number'
+                  placeholder='Giá tối đa'
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  min='0'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Trạng thái</label>
+                <select
+                  value={filterIsActive}
+                  onChange={(e) => setFilterIsActive(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                >
+                  <option value=''>Tất cả</option>
+                  <option value='true'>Hoạt động</option>
+                  <option value='false'>Không hoạt động</option>
+                </select>
+              </div>
             </div>
-            <button
-              type='submit'
-              className='px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
-            >
-              Tìm kiếm
-            </button>
-            {searchTitle && (
+
+            {/* Row 2: Action Buttons */}
+            <div className='flex gap-2'>
+              <button
+                type='submit'
+                className='flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2'
+              >
+                <Search className='w-5 h-5' />
+                Tìm kiếm
+              </button>
               <button
                 type='button'
                 onClick={handleReset}
-                className='px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors'
+                className='flex-1 bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors'
               >
                 Xóa lọc
               </button>
-            )}
+            </div>
           </form>
         </div>
 
