@@ -11,6 +11,7 @@ import CourseManagement from '~/pages/manage/CourseManagement'
 import CategoryManagement from '~/pages/manage/CategoryManagement'
 import ItemManagement from '~/pages/manage/ItemManagement'
 import LevelRangeManagement from '~/pages/manage/LevelRangeManagement'
+import OrderManagement from '~/pages/manage/OrderManagement'
 const AppRoutes: React.FC = () => {
   const navigate = useNavigate()
 
@@ -96,6 +97,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/orders'
+        element={
+          <ProtectedRoute>
+            <OrderManagement />
           </ProtectedRoute>
         }
       />

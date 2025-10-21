@@ -93,6 +93,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       ),
       path: '/level-ranges',
       active: location.pathname === '/level-ranges'
+    },
+    {
+      id: 'order',
+      name: 'Orders',
+      icon: (
+        <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+          <path d='M9 2a1 1 0 000 2h2a1 1 0 100-2H9z' />
+          <path
+            fillRule='evenodd'
+            d='M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z'
+            clipRule='evenodd'
+          />
+        </svg>
+      ),
+      path: '/orders',
+      active: location.pathname === '/orders'
     }
     // {
     //   id: 'package',
@@ -131,12 +147,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     if (currentPath === '/' || currentPath === '/dashboard') return 'Dashboard'
     if (currentPath === '/users') return 'User Management'
     if (currentPath === '/vocabulary') return 'Vocabulary Management'
-    if (currentPath === '/items') return 'Item Management'
-    if (currentPath === '/courses') return 'Course Management'
-    if (currentPath === '/categories') return 'Category Management'
-    if (currentPath === '/level-ranges') return 'Level Range Management'
-    if (currentPath === '/packages') return 'Package Management'
-    if (currentPath === '/assets') return 'Asset Management'
+    if (currentPath === '/items') return 'Quản Lý Vât Phẩm'
+    if (currentPath === '/courses') return 'Quản Lý Khóa Học'
+    if (currentPath === '/categories') return 'Quản Lý Danh Mục Vật Phẩm'
+    if (currentPath === '/level-ranges') return 'Quản Lý Khoảng Cấp Độ'
+    if (currentPath === '/orders') return 'Quản Lý Đơn Hàng'
+    if (currentPath === '/packages') return 'Quản Lý Gói'
+    if (currentPath === '/assets') return 'Quản Lý Tài Sản'
     return 'Dashboard'
   }
 
