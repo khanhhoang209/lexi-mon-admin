@@ -17,7 +17,15 @@ const ItemManagement: React.FC = () => {
   const [pageSize] = useState(8)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Item | null>(null)
+
+  // Search & Filter states
   const [searchName, setSearchName] = useState('')
+  const [searchCategory, setSearchCategory] = useState('')
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
+  const [filterIsActive, setFilterIsActive] = useState('')
+  const [filterIsPremium, setFilterIsPremium] = useState('')
+
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string>('')
 
@@ -61,16 +69,31 @@ const ItemManagement: React.FC = () => {
   }
 
   // Fetch items từ API
-  const fetchItems = async (page: number = 1, name: string = '') => {
+  const fetchItems = async (page: number = 1) => {
     setLoading(true)
     try {
-      const params: Record<string, string | number> = {
+      const params: Record<string, string | number | boolean> = {
         Page: page,
         PageSize: pageSize
       }
 
-      if (name && name.trim()) {
-        params.ItemName = name.trim()
+      if (searchName && searchName.trim()) {
+        params.ItemName = searchName.trim()
+      }
+      if (searchCategory && searchCategory.trim()) {
+        params.CategoryName = searchCategory.trim()
+      }
+      if (minPrice) {
+        params.MinPrice = Number(minPrice)
+      }
+      if (maxPrice) {
+        params.MaxPrice = Number(maxPrice)
+      }
+      if (filterIsActive !== '') {
+        params.IsActive = filterIsActive === 'true'
+      }
+      if (filterIsPremium !== '') {
+        params.IsPremium = filterIsPremium === 'true'
       }
 
       console.log('=== Fetching Items ===')
@@ -97,7 +120,7 @@ const ItemManagement: React.FC = () => {
 
   // Load items và categories khi component mount
   useEffect(() => {
-    fetchItems(1, '')
+    fetchItems(1)
     fetchCategories()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -135,10 +158,7 @@ const ItemManagement: React.FC = () => {
       newErrors.description = 'Mô tả là bắt buộc'
     }
 
-    if (!editingItem && !imageFile) {
-      toast.error('Vui lòng chọn hình ảnh')
-      return false
-    }
+    // Bỏ validation required cho hình ảnh - image là optional
 
     setErrors(newErrors)
     return !Object.values(newErrors).some((error) => error !== '')
@@ -253,27 +273,13 @@ const ItemManagement: React.FC = () => {
       const formDataToSend = new FormData()
       formDataToSend.append('Name', formData.name.trim())
       formDataToSend.append('CategoryId', formData.categoryId)
-      // Backend có thể cần lowercase 'true'/'false' string
-      formDataToSend.append('IsPremium', formData.isPremium ? 'True' : 'False')
+      formDataToSend.append('IsPremium', formData.isPremium ? 'true' : 'false')
       formDataToSend.append('Price', formData.price.toString())
       formDataToSend.append('Coin', formData.coin.toString())
       formDataToSend.append('Description', formData.description.trim())
 
       if (imageFile) {
         formDataToSend.append('Image', imageFile)
-      }
-
-      console.log('=== Sending Item Data ===')
-      console.log('Name:', formData.name)
-      console.log('IsPremium (boolean):', formData.isPremium)
-      console.log('IsPremium (toString):', formData.isPremium.toString())
-      console.log('Price:', formData.price)
-      console.log('Coin:', formData.coin)
-
-      // Debug FormData
-      console.log('=== FormData Contents ===')
-      for (const [key, value] of formDataToSend.entries()) {
-        console.log(`${key}:`, value, `(type: ${typeof value})`)
       }
 
       if (editingItem) {
@@ -288,14 +294,10 @@ const ItemManagement: React.FC = () => {
 
         const data = await response.json()
 
-        console.log('=== UPDATE Response ===')
-        console.log('Status:', response.status)
-        console.log('Data:', data)
-
         if (data.succeeded) {
           toast.success('Cập nhật item thành công')
           handleCloseModal()
-          fetchItems(currentPage, searchName)
+          fetchItems(currentPage)
         } else {
           toast.error(data.message || 'Có lỗi xảy ra')
         }
@@ -311,14 +313,10 @@ const ItemManagement: React.FC = () => {
 
         const data = await response.json()
 
-        console.log('=== CREATE Response ===')
-        console.log('Status:', response.status)
-        console.log('Data:', data)
-
         if (data.succeeded) {
           toast.success('Thêm item thành công')
           handleCloseModal()
-          fetchItems(1, searchName)
+          fetchItems(1)
         } else {
           toast.error(data.message || 'Có lỗi xảy ra')
         }
@@ -344,9 +342,9 @@ const ItemManagement: React.FC = () => {
       if (response && response.succeeded) {
         toast.success('Xóa item thành công')
         if (items.length === 1 && currentPage > 1) {
-          fetchItems(currentPage - 1, searchName)
+          fetchItems(currentPage - 1)
         } else {
-          fetchItems(currentPage, searchName)
+          fetchItems(currentPage)
         }
       }
     } catch (error: unknown) {
@@ -363,19 +361,23 @@ const ItemManagement: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('=== Searching Items ===')
-    console.log('Search Name:', searchName)
-    fetchItems(1, searchName)
+    fetchItems(1)
   }
 
   // Reset tìm kiếm
   const handleResetSearch = () => {
     setSearchName('')
-    fetchItems(1, '')
+    setSearchCategory('')
+    setMinPrice('')
+    setMaxPrice('')
+    setFilterIsActive('')
+    setFilterIsPremium('')
+    fetchItems(1)
   }
 
   // Xử lý thay đổi trang
   const handlePageChange = (page: number) => {
-    fetchItems(page, searchName)
+    fetchItems(page)
   }
 
   // Format tiền
@@ -392,8 +394,8 @@ const ItemManagement: React.FC = () => {
         {/* Header */}
         <div className='flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-900'>Quản lý Items</h1>
-            <p className='mt-2 text-gray-600'>Quản lý các items trong hệ thống ({totalCount} items)</p>
+            {/* <h1 className='text-3xl font-bold text-gray-900'>Quản lý Items</h1> */}
+            <p className='mt-2 text-gray-600'>Tổng số các items trong hệ thống ({totalCount} items)</p>
           </div>
           <button
             onClick={handleOpenAddModal}
@@ -404,36 +406,106 @@ const ItemManagement: React.FC = () => {
           </button>
         </div>
 
-        {/* Search Bar */}
-        <div className='bg-white p-4 rounded-lg shadow'>
-          <form onSubmit={handleSearch} className='flex gap-4'>
-            <div className='flex-1'>
-              <div className='relative'>
-                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+        {/* Search & Filter Bar */}
+        <div className='bg-white p-6 rounded-lg shadow'>
+          <form onSubmit={handleSearch} className='space-y-4'>
+            {/* Row 1: Name, Category, Price Range */}
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Tên item</label>
+                <div className='relative'>
+                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+                  <input
+                    type='text'
+                    placeholder='Tìm kiếm...'
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Danh mục</label>
                 <input
                   type='text'
-                  placeholder='Tìm kiếm theo tên item...'
-                  value={searchName}
-                  onChange={(e) => setSearchName(e.target.value)}
-                  className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  placeholder='Tên danh mục...'
+                  value={searchCategory}
+                  onChange={(e) => setSearchCategory(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Giá từ (VNĐ)</label>
+                <input
+                  type='number'
+                  placeholder='Giá tối thiểu'
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  min='0'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Giá đến (VNĐ)</label>
+                <input
+                  type='number'
+                  placeholder='Giá tối đa'
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  min='0'
                 />
               </div>
             </div>
-            <button
-              type='submit'
-              className='px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
-            >
-              Tìm kiếm
-            </button>
-            {searchName && (
-              <button
-                type='button'
-                onClick={handleResetSearch}
-                className='px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors'
-              >
-                Xóa lọc
-              </button>
-            )}
+
+            {/* Row 2: Status, Premium & Actions */}
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Trạng thái</label>
+                <select
+                  value={filterIsActive}
+                  onChange={(e) => setFilterIsActive(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                >
+                  <option value=''>Tất cả</option>
+                  <option value='true'>Hoạt động</option>
+                  <option value='false'>Không hoạt động</option>
+                </select>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Loại item</label>
+                <select
+                  value={filterIsPremium}
+                  onChange={(e) => setFilterIsPremium(e.target.value)}
+                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                >
+                  <option value=''>Tất cả</option>
+                  <option value='true'>Premium</option>
+                  <option value='false'>Free</option>
+                </select>
+              </div>
+
+              <div className='flex items-end gap-2 md:col-span-2'>
+                <button
+                  type='submit'
+                  className='flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2'
+                >
+                  <Search className='w-5 h-5' />
+                  Tìm kiếm
+                </button>
+                <button
+                  type='button'
+                  onClick={handleResetSearch}
+                  className='flex-1 bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors'
+                >
+                  Xóa lọc
+                </button>
+              </div>
+            </div>
           </form>
         </div>
 
@@ -698,44 +770,36 @@ const ItemManagement: React.FC = () => {
                   </label>
                 </div>
 
-                {/* Giá và Coin - chỉ hiện khi isPremium = true */}
-                {formData.isPremium && (
-                  <>
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>
-                        Giá (VNĐ) <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        type='number'
-                        value={formData.price}
-                        onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors.price ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder='0'
-                        min='0'
-                      />
-                      {errors.price && <p className='mt-1 text-sm text-red-500'>{errors.price}</p>}
-                    </div>
+                {/* Giá và Coin - luôn hiển thị */}
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>Giá (VNĐ)</label>
+                  <input
+                    type='number'
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.price ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder='0'
+                    min='0'
+                  />
+                  {errors.price && <p className='mt-1 text-sm text-red-500'>{errors.price}</p>}
+                </div>
 
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>
-                        Coin <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        type='number'
-                        value={formData.coin}
-                        onChange={(e) => setFormData({ ...formData, coin: Number(e.target.value) })}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors.coin ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder='0'
-                        min='0'
-                      />
-                      {errors.coin && <p className='mt-1 text-sm text-red-500'>{errors.coin}</p>}
-                    </div>
-                  </>
-                )}
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>Coin</label>
+                  <input
+                    type='number'
+                    value={formData.coin}
+                    onChange={(e) => setFormData({ ...formData, coin: Number(e.target.value) })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.coin ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder='0'
+                    min='0'
+                  />
+                  {errors.coin && <p className='mt-1 text-sm text-red-500'>{errors.coin}</p>}
+                </div>
 
                 {/* Mô tả */}
                 <div className='md:col-span-2'>
@@ -756,9 +820,7 @@ const ItemManagement: React.FC = () => {
 
                 {/* Hình ảnh */}
                 <div className='md:col-span-2'>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Hình ảnh {!editingItem && <span className='text-red-500'>*</span>}
-                  </label>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>Hình ảnh</label>
                   <div className='flex items-center space-x-4'>
                     <label className='flex-1 flex items-center justify-center px-4 py-2 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-blue-500 transition-colors'>
                       <div className='space-y-1 text-center'>

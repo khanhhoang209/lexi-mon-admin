@@ -269,23 +269,22 @@ export default function LevelRangeManagement() {
     <AdminLayout>
       <div className='space-y-6'>
         {/* Header */}
-        <div>
-          <h1 className='text-3xl font-bold text-gray-900'>Level Range Management</h1>
-          <p className='text-gray-600 mt-2'>Quản lý các level ranges trong hệ thống ({totalCount} level ranges)</p>
-        </div>
-
-        {/* Actions */}
         <div className='flex justify-between items-center'>
-          <div></div>
+          <div>
+            {/* <h1 className='text-3xl font-bold text-gray-900'>Level Range Management</h1> */}
+            <p className='text-gray-600 mt-2'>Tổng số level ranges trong hệ thống ({totalCount} level ranges)</p>
+          </div>
+
+          {/* Actions */}
+
           <button
             onClick={handleOpenAddModal}
             className='flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
           >
             <Plus className='w-5 h-5' />
-            Thêm level range
+            Thêm Level Range
           </button>
         </div>
-
         {/* Table */}
         <div className='bg-white rounded-lg shadow overflow-hidden'>
           <div className='overflow-x-auto'>
