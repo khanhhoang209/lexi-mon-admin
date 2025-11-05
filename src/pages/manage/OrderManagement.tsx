@@ -30,8 +30,8 @@ const OrderManagement: React.FC = () => {
   const paymentStatusMap: typeof PaymentStatusMap = {
     0: 'Chưa thanh toán',
     1: 'Đã thanh toán',
-    2: 'Đã hủy',
-    3: 'Hoàn tiền'
+    2: 'Thất bại',
+    3: 'Đã hủy'
   }
 
   const paymentStatusColorMap: typeof PaymentStatusColorMap = {
@@ -224,8 +224,8 @@ const OrderManagement: React.FC = () => {
                   <option value=''>Tất cả</option>
                   <option value='0'>Chưa thanh toán</option>
                   <option value='1'>Đã thanh toán</option>
-                  <option value='2'>Đã hủy</option>
-                  <option value='3'>Hoàn tiền</option>
+                  <option value='2'>Thất bại</option>
+                  <option value='3'>Đã hủy</option>
                 </select>
               </div>
 
